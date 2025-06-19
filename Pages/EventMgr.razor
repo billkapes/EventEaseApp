@@ -4,31 +4,52 @@
 
 @inject EventService EventService
 
-<h3>Event Manager</h3>
+<h2>Event Manager</h2>
 
-<div class="mb-3">
-    <input placeholder="Event Name" @bind="newEvent.Name" class="form-control mb-1" />
-    <input placeholder="Description" @bind="newEvent.Description" class="form-control mb-1" />
-    <input type="date" @bind="newEvent.Date" class="form-control mb-1" />
-    <input placeholder="Location" @bind="newEvent.Location" class="form-control mb-1" />
-    <button class="btn btn-primary" @onclick="AddEvent">Add Event</button>
-</div>
+<EditForm Model="newEvent" OnValidSubmit="AddEvent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-@if (events.Any())
+    <div class="form-group">
+        <label>Name:</label>
+        <InputText class="form-control" @bind-Value="newEvent.Name" />
+        <ValidationMessage For="@(() => newEvent.Name)" />
+    </div>
+    <div class="form-group">
+        <label>Description:</label>
+        <InputTextArea class="form-control" @bind-Value="newEvent.Description" />
+        <ValidationMessage For="@(() => newEvent.Description)" />
+    </div>
+    <div class="form-group">
+        <label>Date:</label>
+        <InputDate class="form-control" @bind-Value="newEvent.Date" />
+        <ValidationMessage For="@(() => newEvent.Date)" />
+    </div>
+    <div class="form-group">
+        <label>Location:</label>
+        <InputText class="form-control" @bind-Value="newEvent.Location" />
+        <ValidationMessage For="@(() => newEvent.Location)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add Event</button>
+</EditForm>
+
+<hr />
+
+@if (events.Count == 0)
 {
-    @foreach (var ev in events)
-    {
-        <EventCard Event="ev" OnDelete="() => DeleteEvent(ev)" />
-    }
+    <p>No events yet.</p>
 }
 else
 {
-    <p>No events found.</p>
+    @foreach (var evt in events)
+    {
+        <EventCard Event="evt" OnDelete="() => DeleteEvent(evt)" />
+    }
 }
 
 @code {
     private List<Event> events = new();
-    private Event newEvent = new() { Date = DateTime.Today };
+    private Event newEvent = new();
 
     protected override void OnInitialized()
     {
@@ -38,13 +59,15 @@ else
     private void AddEvent()
     {
         EventService.AddEvent(newEvent);
+        newEvent = new Event();
         events = EventService.GetEvents().ToList();
-        newEvent = new Event { Date = DateTime.Today };
+        StateHasChanged();
     }
 
-    private void DeleteEvent(Event ev)
+    private void DeleteEvent(Event evt)
     {
-        EventService.DeleteEvent(ev);
+        EventService.DeleteEvent(evt);
         events = EventService.GetEvents().ToList();
+        StateHasChanged();
     }
 }
