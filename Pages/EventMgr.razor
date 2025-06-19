@@ -1,6 +1,7 @@
 @page "/eventmgr"
 @using EventEaseApp.Models
 @using EventEaseApp.Services
+
 @inject EventService EventService
 
 <h3>Event Manager</h3>
@@ -15,31 +16,10 @@
 
 @if (events.Any())
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ev in events)
-            {
-                <tr>
-                    <td>@ev.Name</td>
-                    <td>@ev.Description</td>
-                    <td>@ev.Date.ToShortDateString()</td>
-                    <td>@ev.Location</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteEvent(ev)">Delete</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    @foreach (var ev in events)
+    {
+        <EventCard Event="ev" OnDelete="() => DeleteEvent(ev)" />
+    }
 }
 else
 {

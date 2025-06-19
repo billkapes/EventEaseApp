@@ -1,0 +1,18 @@
+@using EventEaseApp.Models
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Event.Name</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Event.Date.ToShortDateString() - @Event.Location</h6>
+        <p class="card-text">@Event.Description</p>
+        <button class="btn btn-danger btn-sm" @onclick="OnDelete">Delete</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Event Event { get; set; }
+
+    [Parameter]
+    public EventCallback OnDelete { get; set; }
+}
