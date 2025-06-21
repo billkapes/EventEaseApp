@@ -22,5 +22,13 @@ namespace EventEaseApp.Services
         {
             _events.Remove(eventToDelete);
         }
+
+        public void RegisterUser(Event evt, string userName)
+        {
+            if (!string.IsNullOrWhiteSpace(userName) && !evt.RegisteredUsers.Contains(userName))
+            {
+                evt.RegisteredUsers.Add(userName);
+            }
+        }
     }
 }

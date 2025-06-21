@@ -1,0 +1,46 @@
+@page "/addevent"
+@using EventEaseApp.Models
+@using EventEaseApp.Services
+@inject EventService EventService
+@inject NavigationManager Navigation
+
+<h2>Add Event</h2>
+
+<EditForm Model="newEvent" OnValidSubmit="AddNewEvent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Name:</label>
+        <InputText class="form-control" @bind-Value="newEvent.Name" />
+        <ValidationMessage For="@(() => newEvent.Name)" />
+    </div>
+    <div class="form-group">
+        <label>Description:</label>
+        <InputTextArea class="form-control" @bind-Value="newEvent.Description" />
+        <ValidationMessage For="@(() => newEvent.Description)" />
+    </div>
+    <div class="form-group">
+        <label>Date:</label>
+        <InputDate class="form-control" @bind-Value="newEvent.Date" />
+        <ValidationMessage For="@(() => newEvent.Date)" />
+    </div>
+    <div class="form-group">
+        <label>Location:</label>
+        <InputText class="form-control" @bind-Value="newEvent.Location" />
+        <ValidationMessage For="@(() => newEvent.Location)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add Event</button>
+</EditForm>
+
+@code {
+    private Event newEvent = new();
+
+    private void AddNewEvent()
+    {
+        EventService.AddEvent(newEvent);
+        newEvent = new Event();
+        Navigation.NavigateTo("/eventmgr");
+    }
+}
+

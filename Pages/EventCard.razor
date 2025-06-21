@@ -1,12 +1,40 @@
 @using EventEaseApp.Models
+@using EventEaseApp.Services
 
-<div class="card mb-3">
-    <div class="card-body">
-        <h5 class="card-title">@Event.Name</h5>
-        <h6 class="card-subtitle mb-2 text-muted">@Event.Date.ToShortDateString() - @Event.Location</h6>
-        <p class="card-text">@Event.Description</p>
-        <button class="btn btn-danger btn-sm" @onclick="OnDelete">Delete</button>
+<div class="event-card">
+    <div class="event-card-content">
+        <h3>@Event.Name</h3>
+        <div class="event-field">
+            <label><strong>Description:</strong></label>
+            <span>@Event.Description</span>
+        </div>
+        <div class="event-field">
+            <label><strong>Date:</strong></label>
+            <span>@Event.Date.ToString("MMMM dd, yyyy")</span>
+        </div>
+        <div class="event-field">
+            <label><strong>Location:</strong></label>
+            <span>@Event.Location</span>
+        </div>
+        <div class="event-field">
+            <label><strong>Registered Users:</strong></label>
+            <span>
+                @if (Event.RegisteredUsers.Any())
+                {
+                    @string.Join(", ", Event.RegisteredUsers)
+                }
+                else
+                {
+                    <em>No one registered yet.</em>
+                }
+            </span>
+        </div>
+        <EditForm Model="registrationModel" OnValidSubmit="Register">
+            <InputText @bind-Value="registrationModel.UserName" placeholder="Your name" />
+            <button type="submit" class="register-btn">Register</button>
+        </EditForm>
     </div>
+    <button class="delete-btn" @onclick="OnDelete">Delete</button>
 </div>
 
 @code {
@@ -14,5 +42,28 @@
     public Event Event { get; set; }
 
     [Parameter]
-    public EventCallback OnDelete { get; set; }
+    public EventCallback OnDeleteClicked { get; set; }
+
+    [Inject]
+    public EventService EventService { get; set; }
+
+    private RegistrationModel registrationModel = new();
+
+    private void OnDelete()
+    {
+        OnDeleteClicked.InvokeAsync();
+    }
+
+    private void Register()
+    {
+        EventService.RegisterUser(Event, registrationModel.UserName);
+        registrationModel = new RegistrationModel();
+        StateHasChanged();
+    }
+
+    public class RegistrationModel
+    {
+        //[Required(ErrorMessage = "Name is required")]
+        public string UserName { get; set; }
+    }
 }
