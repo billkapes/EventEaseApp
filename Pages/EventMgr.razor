@@ -25,14 +25,15 @@ else
 @code {
     private List<Event> events = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await EventService.InitializeAsync();
         events = EventService.GetEvents().ToList();
     }
 
-    private void DeleteEvent(Event evt)
+    private async Task DeleteEvent(Event evt)
     {
-        EventService.DeleteEvent(evt);
+        await EventService.DeleteEvent(evt);
         events = EventService.GetEvents().ToList();
         StateHasChanged();
     }

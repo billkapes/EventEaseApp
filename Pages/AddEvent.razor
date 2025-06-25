@@ -36,9 +36,9 @@
 @code {
     private Event newEvent = new();
 
-    private void AddNewEvent()
+    private async Task AddNewEvent()
     {
-        EventService.AddEvent(newEvent);
+        await EventService.AddEvent(newEvent);
         newEvent = new Event();
         Navigation.NavigateTo("/eventmgr");
     }
