@@ -17,6 +17,7 @@ namespace EventEaseApp.Models
         [Required(ErrorMessage = "Location is required")]
         public string Location { get; set; }
 
-        public List<string> RegisteredUsers { get; set; } = new List<string>();
+        //public List<string> RegisteredUsers { get; set; } = new List<string>();
+        public List<Registration> RegisteredUsers { get; set; } = new List<Registration>();
     }
 }

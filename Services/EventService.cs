@@ -49,11 +49,13 @@ namespace EventEaseApp.Services
             _events = await _localStorage.GetItemAsync<List<Event>>(StorageKey) ?? new List<Event>();
         }
 
-        public void RegisterUser(Event evt, string userName)
+        public async Task RegisterUser(Event evt, string userName, string email)
         {
-            if (!string.IsNullOrWhiteSpace(userName) && !evt.RegisteredUsers.Contains(userName))
+            if (!string.IsNullOrWhiteSpace(userName) && !string.IsNullOrWhiteSpace(email)
+                && !evt.RegisteredUsers.Any(r => r.UserName == userName && r.Email == email))
             {
-                evt.RegisteredUsers.Add(userName);
+                evt.RegisteredUsers.Add(new Registration { UserName = userName, Email = email });
+                await SaveEvents();
             }
         }
     }

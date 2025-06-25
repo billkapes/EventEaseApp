@@ -1,3 +1,4 @@
+@using System.ComponentModel.DataAnnotations
 @using EventEaseApp.Models
 @using EventEaseApp.Services
 
@@ -21,7 +22,10 @@
             <span>
                 @if (Event.RegisteredUsers.Any())
                 {
-                    @string.Join(", ", Event.RegisteredUsers)
+                    @foreach (var reg in Event.RegisteredUsers)
+                    {
+                        <div>@reg.UserName (@reg.Email)</div>
+                    }
                 }
                 else
                 {
@@ -30,11 +34,30 @@
             </span>
         </div>
         <EditForm Model="registrationModel" OnValidSubmit="Register">
-            <InputText @bind-Value="registrationModel.UserName" placeholder="Your name" />
-            <button type="submit" class="register-btn">Register</button>
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <InputText @bind-Value="registrationModel.UserName" placeholder="Your name" class="form-control" />
+                <ValidationMessage For="@(() => registrationModel.UserName)" />
+            </div>
+            <div class="form-group">
+                <InputText @bind-Value="registrationModel.Email" placeholder="Your email" class="form-control" />
+                <ValidationMessage For="@(() => registrationModel.Email)" />
+            </div>
+            <button type="submit" class="register-btn">Register for event</button>
         </EditForm>
     </div>
-    <button class="delete-btn" @onclick="OnDelete">Delete</button>
+    <button class="delete-btn" @onclick="ShowConfirmDelete">Delete Event</button>
+
+    @if (showConfirm)
+    {
+        <div class="modal-backdrop">
+            <div class="modal-confirm">
+                <p>Are you sure you want to delete this event?</p>
+                <button class="btn btn-danger" @onclick="ConfirmDelete">Yes, Delete</button>
+                <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -47,23 +70,61 @@
     [Inject]
     public EventService EventService { get; set; }
 
-    private RegistrationModel registrationModel = new();
+    private RegistrationModel registrationModel = new EventCard.RegistrationModel();
+    private bool showConfirm = false;
 
-    private void OnDelete()
+    private void ShowConfirmDelete()
     {
-        OnDeleteClicked.InvokeAsync();
+        showConfirm = true;
     }
 
-    private void Register()
+    private void CancelDelete()
     {
-        EventService.RegisterUser(Event, registrationModel.UserName);
+        showConfirm = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        showConfirm = false;
+        await OnDeleteClicked.InvokeAsync();
+    }
+
+    private async Task Register()
+    {
+        await EventService.RegisterUser(Event, registrationModel.UserName, registrationModel.Email);
         registrationModel = new RegistrationModel();
         StateHasChanged();
     }
 
     public class RegistrationModel
     {
-        //[Required(ErrorMessage = "Name is required")]
+        [Required(ErrorMessage = "Name is required")]
         public string UserName { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
     }
 }
+
+<style>
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-confirm {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    text-align: center;
+}
+.modal-confirm button {
+    margin: 0 0.5rem;
+}
+</style>
