@@ -1,6 +1,7 @@
 @using System.ComponentModel.DataAnnotations
 @using EventEaseApp.Models
 @using EventEaseApp.Services
+@inject EventService EventService
 
 <div class="event-card">
     <div class="event-card-content">
@@ -22,9 +23,9 @@
             <span>
                 @if (Event.RegisteredUsers.Any())
                 {
-                    @foreach (var reg in Event.RegisteredUsers)
+                    @foreach (var user in Event.RegisteredUsers)
                     {
-                        <div>@reg.UserName (@reg.Email)</div>
+                        <div>@user.UserName (@user.Email)</div>
                     }
                 }
                 else
@@ -66,9 +67,6 @@
 
     [Parameter]
     public EventCallback OnDeleteClicked { get; set; }
-
-    [Inject]
-    public EventService EventService { get; set; }
 
     private RegistrationModel registrationModel = new EventCard.RegistrationModel();
     private bool showConfirm = false;
